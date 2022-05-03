@@ -15,8 +15,6 @@ class Navigator2test extends ConsumerWidget {
     var buttonId = ref.watch(buttonIdProvider);
     return MaterialApp(
       title: 'Books App',
-      //宣言的な画面遷移の管理部分
-      //_buttonIdの値によって変化する
       home: Navigator(
         pages: [
           MaterialPage(
