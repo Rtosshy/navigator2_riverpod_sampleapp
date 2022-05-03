@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
- 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final buttonIdProvider = StateProvider((ref) => 0);
+
 void main() {
-  runApp(const Navigator2test());
+  runApp(const ProviderScope(child: Navigator2test()));
 }
- 
-class Navigator2test extends StatefulWidget {
+
+class Navigator2test extends ConsumerWidget {
   const Navigator2test({Key? key}) : super(key: key);
- 
+
   @override
-  State<Navigator2test> createState() => _Navigator2testState();
-}
- 
-class _Navigator2testState extends State<Navigator2test> {
-  int? _buttonId;
- 
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var buttonId = ref.watch(buttonIdProvider);
     return MaterialApp(
       title: 'Books App',
       //宣言的な画面遷移の管理部分
@@ -23,21 +20,17 @@ class _Navigator2testState extends State<Navigator2test> {
       home: Navigator(
         pages: [
           MaterialPage(
-            child: MenuPage(
-              toPage1: _toPage1,
-              toPage2: _toPage2,
-              toPage3: _toPage3,
-            ),
+            child: MenuPage(),
           ),
-          if (_buttonId == 1)
+          if (buttonId == 1)
             const MaterialPage(
               child: Page1(),
             ),
-          if (_buttonId == 2)
+          if (buttonId == 2)
             const MaterialPage(
               child: Page2(),
             ),
-          if (_buttonId == 3)
+          if (buttonId == 3)
             const MaterialPage(
               child: Page3(),
             ),
@@ -46,48 +39,19 @@ class _Navigator2testState extends State<Navigator2test> {
           if (!route.didPop(result)) {
             return false;
           }
-          setState(() {
-            _buttonId = null;
-          });
+          ref.read(buttonIdProvider.state).state = 0;
           return true;
         },
       ),
     );
   }
- 
-  //ページ遷移のためのコールバック関数
-  //管理している状態の数値を変更する
-  void _toPage1() {
-    setState(() {
-      _buttonId = 1;
-    });
-  }
- 
-  void _toPage2() {
-    setState(() {
-      _buttonId = 2;
-    });
-  }
- 
-  void _toPage3() {
-    setState(() {
-      _buttonId = 3;
-    });
-  }
 }
- 
-class MenuPage extends StatelessWidget {
-  const MenuPage({Key? key, this.toPage1, this.toPage2, this.toPage3})
-      : super(key: key);
- 
-  //画面遷移を指示するコールバック関数
-  //ボタンが押された時に反応する
-  final void Function()? toPage1;
-  final void Function()? toPage2;
-  final void Function()? toPage3;
- 
+
+class MenuPage extends ConsumerWidget {
+  const MenuPage({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Menu Page'),
@@ -96,19 +60,31 @@ class MenuPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ElevatedButton(onPressed: toPage1, child: const Text('Page1')),
-            ElevatedButton(onPressed: toPage2, child: const Text('Page2')),
-            ElevatedButton(onPressed: toPage3, child: const Text('Page3')),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(buttonIdProvider.state).state = 1;
+              },
+              child: const Text('Page1')),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(buttonIdProvider.state).state = 2;
+              }, 
+              child: const Text('Page2')),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(buttonIdProvider.state).state = 3;
+              }, 
+              child: const Text('Page3')),
           ],
         ),
       ),
     );
   }
 }
- 
+
 class Page1 extends StatelessWidget {
   const Page1({Key? key}) : super(key: key);
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,10 +98,10 @@ class Page1 extends StatelessWidget {
     );
   }
 }
- 
+
 class Page2 extends StatelessWidget {
   const Page2({Key? key}) : super(key: key);
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,10 +115,10 @@ class Page2 extends StatelessWidget {
     );
   }
 }
- 
+
 class Page3 extends StatelessWidget {
   const Page3({Key? key}) : super(key: key);
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
